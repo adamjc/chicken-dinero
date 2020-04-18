@@ -1,0 +1,22 @@
+{
+  "name": "blackjack",
+  "version": "1.0.0",
+  "description": "Blackjack.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "blackjack",
+    "black",
+    "jack"
+  ],
+  "author": "adamjc",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^25.3.0"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  }
+}
