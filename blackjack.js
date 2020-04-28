@@ -1,8 +1,8 @@
 const Deck = require('./deck.js')
 
-function Blackjack () {
+function Blackjack (dealerStandValue = 17) {
   const BLACKJACK = 21
-  const DEALER_STAND_VALUE = 17
+  const DEALER_STAND_VALUE = dealerStandValue
   const states = {
     READY: 0,
     DEAL_PLAYER: 1,
