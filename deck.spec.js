@@ -15,7 +15,7 @@ describe('Deck', () => {
       'AS', 'KS', 'QS', 'JS', 'TS', '9S', '8S', '7S', '6S', '5S', '4S', '3S', '2S'
     ]
 
-    deck.cards.forEach((card, i) => {
+    deck.cards().forEach((card, i) => {
       card.turn()
       expect(card.value()).toEqual(expected[i])
     })
@@ -26,6 +26,6 @@ describe('Deck', () => {
     card.turn()
 
     expect(card.value()).toMatch(/[AKQJT98765432][HCDS]/)
-    expect(deck.cards.length).toEqual(51)
+    expect(deck.cards().length).toEqual(51)
   })
 })

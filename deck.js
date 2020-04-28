@@ -12,25 +12,24 @@ function Card (rank, suit) {
   }
 }
 
-class Deck {
-  constructor () {
-    this._cards = []
+function Deck () {
+  let cards = []
 
-    suits.forEach(suit => {
-      ranks.forEach(rank => {
-        this._cards.push(new Card(rank, suit))
-      })
+  suits.forEach(suit => {
+    ranks.forEach(rank => {
+      cards.push(new Card(rank, suit))
     })
-  }
+  }) 
 
-  get cards () {
-    return this._cards
-  }
-
-  take () {
-    const i = Math.random() * this._cards.length
-    const card = this._cards.splice(i, 1)[0]
+  function take () {
+    const i = Math.random() * cards.length
+    const card = cards.splice(i, 1)[0]
     return card
+  }
+
+  return {
+    cards: () => cards,
+    take
   }
 }
 
