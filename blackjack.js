@@ -12,6 +12,7 @@ function Blackjack () {
 
   let state = states.READY
   const deck = new Deck()
+  const dealerHand = []
   const player = {
     chips: 100,
     hand: []
@@ -19,7 +20,8 @@ function Blackjack () {
 
   // starts the game
   function wager (amount = 0) {
-    // subtract amount from player, add to their 'wagered' amount in some way
+    if (state !== states.READY) return
+    
     state = states.DEAL_PLAYER
   }
 
@@ -36,7 +38,37 @@ function Blackjack () {
 
   // do a step
   function step () {
+    switch (state) {
+      case states.DEAL_PLAYER:
+        dealPlayer()
+        return
+      case states.DEAL_DEALER:
+        dealDealer()
+        return
+    }
+  }
 
+  function dealPlayer () {
+    if (player.hand.length < 2) {
+      const c = deck.take()
+      c.turn()
+      player.hand.push(c)
+    } else {
+      state = states.DEAL_DEALER
+    }
+  }
+
+  function dealDealer () {
+    if (!dealerHand.length) {
+      const c = deck.take()
+      c.turn()
+      dealerHand.push(c)
+    } else if (dealerHand.length === 1) {
+      const c = deck.take()
+      dealerHand.push(c)
+    } else {
+      state = states.PLAYER_TURN
+    }
   }
 
   function hit () {
@@ -53,7 +85,9 @@ function Blackjack () {
     hit,
     stand,
     step,
+    dealerHand: () => dealerHand,
     state: () => state,
+    player: () => player,
     states
   }
 }
