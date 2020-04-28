@@ -1,6 +1,8 @@
 const Deck = require('./deck.js')
 
 function Blackjack () {
+  const BLACKJACK = 21
+  const DEALER_STAND_VALUE = 17
   const states = {
     READY: 0,
     DEAL_PLAYER: 1,
@@ -69,12 +71,30 @@ function Blackjack () {
   }
 
   function hit () {
+    if (state === state.PLAYER_TURN) {
+      const c = deck.take()
+      c.turn()
+      player.hand.push(c)
+      
+      if (total(player.hand) >= BLACKJACK) {
+        state = states.DEALER_TURN
+      }
+    } else if (state === state.DEALER_TURN) {
+      const c = deck.take()
+      c.turn()
+      dealerHand.push(c)
 
+      if (total(dealerHand) >= DEALER_STAND_VALUE) {
+        state = CALCUATE_WINNER
+      }
+    }
   }
 
   function stand () {
 
   }
+
+  const total = cards => cards.reduce((prev, curr) => prev + curr)
 
   return {
     listActions,
