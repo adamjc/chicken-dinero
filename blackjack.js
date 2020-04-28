@@ -27,10 +27,10 @@ function Blackjack () {
 
   function listActions () {
     switch (state) {
-      case states.READY: return ['wager']
+      case states.READY: return [wager.name]
       case states.DEAL_PLAYER: return []
       case state.DEAL_DEALER: return []
-      case states.PLAYER_TURN: return ['hit', 'stand']
+      case states.PLAYER_TURN: return [hit.name, stand.name]
       case states.DEALER_TURN: return []
       case states.CALCULATE_WINNER: return []
     }
