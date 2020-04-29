@@ -41,6 +41,9 @@ function Blackjack (dealerStandValue = 17, session = {}) {
       case states.DEAL_DEALER:
         dealDealer()
         return
+      case states.DEALER_TURN:
+        hit()
+        return
     }
   }
 
@@ -53,7 +56,7 @@ function Blackjack (dealerStandValue = 17, session = {}) {
     
     if (player.hand.length === 2) {
       if (total(player.hand) === BLACKJACK) {
-        state = states.CALCUATE_WINNER
+        state = states.CALCULATE_WINNER
       } else {
         state = states.DEAL_DEALER
       }
@@ -89,13 +92,13 @@ function Blackjack (dealerStandValue = 17, session = {}) {
       dealerHand.push(c)
 
       if (total(dealerHand) >= DEALER_STAND_VALUE) {
-        state = CALCUATE_WINNER
+        state = states.CALCULATE_WINNER
       }
     }
   }
 
   function stand () {
-
+    state = states.DEALER_TURN
   }
 
   function total (cards) {

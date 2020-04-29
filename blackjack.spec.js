@@ -176,7 +176,7 @@ describe('Blackjack', () => {
           expect(game.player().hand.length).toEqual(3)
         })
   
-        it('should be in the DEALER_TURN state', () => {
+        it('should move to the DEALER_TURN state', () => {
           expect(game.state()).toEqual(game.states.DEALER_TURN)
         })
       })
@@ -207,18 +207,75 @@ describe('Blackjack', () => {
           const hit = game.listActions().filter(fn => fn.name === 'hit')[0] // eeeeeeeh
           hit() // eeeeeeEEEHHHH
         })
-
-        afterAll(() => {
-          mockFn.mockReset()
-        })
   
         it(`should add a card to the player's hand`, () => {
           expect(game.player().hand.length).toEqual(3)
         })
   
-        it('should be in the CALCULATE_WINNER state', () => {
+        it('should move to the CALCULATE_WINNER state', () => {
           expect(game.state()).toEqual(game.states.CALCULATE_WINNER)
         })
+      })
+    })
+
+    describe('stand', () => {
+      let game
+
+      beforeEach(() => {
+        cards = [
+          new Card('6', 'S', true),
+          new Card('A', 'H', true),
+        ]
+
+        game = new Blackjack(17, {
+          state: 3,
+          player: { 
+            hand: cards
+          },
+          dealerHand: cards
+        })
+
+        const stand = game.listActions().filter(fn => fn.name === 'stand')[0] // eeeeeeeh
+        stand() // eeeeeeEEEHHHH
+      })
+
+      it('should be move to the DEALER_TURN state', () => {
+        expect(game.state()).toEqual(game.states.DEALER_TURN)
+      })
+    })
+  })
+
+  describe('DEALER_TURN', () => {
+    describe('hitting the dealer stand value', () => {
+      let game
+
+      beforeAll(() => {
+        Deck.mockImplementation(() => {
+          return {
+            take: () => new Card('A', 'S')
+          }
+        })
+      })
+
+      beforeEach(() => {
+        game = new Blackjack(17, {
+          state: 4,
+          player: { 
+            hand: [
+              new Card('A', 'S', true),
+              new Card('T', 'S', true),
+            ]
+          },
+          dealerHand: [
+            new Card('A', 'S', true),
+            new Card('9', 'S', true),
+          ]
+        })
+      })
+
+      it('should move to CALCULATE_WINNER', () => {
+        game.step()
+        expect(game.state()).toEqual(game.states.CALCULATE_WINNER)
       })
     })
   })
