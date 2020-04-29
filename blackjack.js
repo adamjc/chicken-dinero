@@ -1,6 +1,6 @@
 const Deck = require('./deck.js')
 
-function Blackjack (dealerStandValue = 17) {
+function Blackjack (dealerStandValue = 17, session = {}) {
   const BLACKJACK = 21
   const DEALER_STAND_VALUE = dealerStandValue
   const states = {
@@ -12,13 +12,10 @@ function Blackjack (dealerStandValue = 17) {
     CALCUATE_WINNER: 5
   }
 
-  let state = states.READY
-  const deck = new Deck()
-  const dealerHand = []
-  const player = {
-    chips: 100,
-    hand: []
-  }
+  let state = session.state || states.READY
+  const deck = session.deck || new Deck()
+  const dealerHand = session.dealerHand || []
+  const player = session.player || { hand: [] }
 
   // starts the game
   function wager (amount = 0) {
@@ -72,7 +69,7 @@ function Blackjack (dealerStandValue = 17) {
   }
 
   function hit () {
-    if (state === state.PLAYER_TURN) {
+    if (state === states.PLAYER_TURN) {
       const c = deck.take()
       c.turn()
       player.hand.push(c)
@@ -80,7 +77,7 @@ function Blackjack (dealerStandValue = 17) {
       if (total(player.hand) >= BLACKJACK) {
         state = states.DEALER_TURN
       }
-    } else if (state === state.DEALER_TURN) {
+    } else if (state === states.DEALER_TURN) {
       const c = deck.take()
       c.turn()
       dealerHand.push(c)

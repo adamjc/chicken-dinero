@@ -1,4 +1,11 @@
 const Blackjack = require('./blackjack.js')
+const Deck = require('./deck.js')
+jest.mock('./deck.js')
+Deck.mockImplementation(() => {
+  return {
+    take: () => ({value: ['2H'], turn: () => {}})
+  }
+})
 
 // This test RELIES on each `it` changing the state of the game, time will tell if this is horrendous decision.
 // Usually I'd avoid this behaviour at all costs.
@@ -25,17 +32,6 @@ describe('Blackjack', () => {
       expect(game.player().hand.length).toEqual(1)
       game.step()
       expect(game.player().hand.length).toEqual(2)
-  
-      const hand = game.player().hand
-  
-      const cardSchema = expect.objectContaining({
-        value: expect.any(Function),
-        turn: expect.any(Function)
-      })
-  
-      hand.forEach(card => {
-        expect(card).toEqual(cardSchema)
-      })
     })
 
     it('then moves the game state to DEAL_DEALER', () => {
@@ -50,21 +46,46 @@ describe('Blackjack', () => {
       expect(game.dealerHand().length).toEqual(1)
       game.step()
       expect(game.dealerHand().length).toEqual(2)
-  
-      const hand = game.dealerHand()
-  
-      const cardSchema = expect.objectContaining({
-        value: expect.any(Function),
-        turn: expect.any(Function)
-      })
-  
-      hand.forEach(card => {
-        expect(card).toEqual(cardSchema)
-      })
     })
 
     it('then moves the game state to PLAYER_TURN', () => {
       expect(game.state()).toEqual(game.states.PLAYER_TURN)
+    })
+  })
+
+  describe('PLAYER_TURN', () => {
+    it(`should let the player 'hit' or 'stand'`, () => {
+      const expectedActions = expect.arrayContaining([
+        expect.any(Function),
+        expect.any(Function),
+      ])
+      const actualActions = game.listActions()
+      const actualActionNames = actualActions.map(fn => fn.name)
+      expect(actualActions).toEqual(expectedActions)
+      expect(actualActionNames).toEqual(['hit', 'stand'])
+    })
+
+    describe('hit', () => {
+      describe('hit and below 21', () => {
+        beforeAll(() => {
+          Deck.mockImplementation(() => {
+            return {
+              take: () => ({value: ['2H'], turn: () => {}})
+            }
+          })
+
+          const hit = game.listActions().filter(fn => fn.name === 'hit')[0] // eeeeeeeh
+          hit() // eeeeeeEEEHHHH
+        })
+  
+        it(`should add a card to the player's hand`, () => {
+          expect(game.player().hand.length).toEqual(3)
+        })
+
+        it('should still be in the PLAYER_TURN state', () => {
+          expect(game.state()).toEqual(game.states.PLAYER_TURN)
+        })
+      })
     })
   })
 })
