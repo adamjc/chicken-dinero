@@ -52,7 +52,9 @@ function Blackjack (dealerStandValue = 17) {
       const c = deck.take()
       c.turn()
       player.hand.push(c)
-    } else {
+    }
+    
+    if (player.hand.length === 2) {
       state = states.DEAL_DEALER
     }
   }
@@ -65,7 +67,6 @@ function Blackjack (dealerStandValue = 17) {
     } else if (dealerHand.length === 1) {
       const c = deck.take()
       dealerHand.push(c)
-    } else {
       state = states.PLAYER_TURN
     }
   }
