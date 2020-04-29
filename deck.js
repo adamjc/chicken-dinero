@@ -1,10 +1,14 @@
 const suits = ['H', 'C', 'D', 'S']
 const ranks = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2']
 
-function Card (rank, suit) {
+function Card (rank, suit, faceUp = false) {
   const FACE_DOWN = null
-  const FACE_UP = `${rank}${suit}`
-  let turned = false
+  const FACE_UP = {
+    rank,
+    suit,
+    faceValue: `${rank}${suit}`
+  }
+  let turned = faceUp
 
   return {
     value: () => turned ? FACE_UP : FACE_DOWN,
@@ -33,4 +37,7 @@ function Deck () {
   }
 }
 
-module.exports = Deck
+module.exports = {
+  Deck,
+  Card
+}

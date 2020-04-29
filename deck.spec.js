@@ -1,4 +1,4 @@
-const Deck = require('./deck.js')
+const { Deck } = require('./deck.js')
 
 describe('Deck', () => {
   let deck
@@ -17,7 +17,7 @@ describe('Deck', () => {
 
     deck.cards().forEach((card, i) => {
       card.turn()
-      expect(card.value()).toEqual(expected[i])
+      expect(card.value().faceValue).toEqual(expected[i])
     })
   })
 
@@ -25,7 +25,7 @@ describe('Deck', () => {
     const card = deck.take()
     card.turn()
 
-    expect(card.value()).toMatch(/[AKQJT98765432][HCDS]/)
+    expect(card.value().faceValue).toMatch(/[AKQJT98765432][HCDS]/)
     expect(deck.cards().length).toEqual(51)
   })
 })

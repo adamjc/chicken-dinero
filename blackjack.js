@@ -1,4 +1,4 @@
-const Deck = require('./deck.js')
+const { Deck } = require('./deck.js')
 
 function Blackjack (dealerStandValue = 17, session = {}) {
   const BLACKJACK = 21
@@ -9,7 +9,7 @@ function Blackjack (dealerStandValue = 17, session = {}) {
     DEAL_DEALER: 2,
     PLAYER_TURN: 3,
     DEALER_TURN: 4,
-    CALCUATE_WINNER: 5
+    CALCULATE_WINNER: 5
   }
 
   let state = session.state || states.READY
@@ -52,7 +52,11 @@ function Blackjack (dealerStandValue = 17, session = {}) {
     }
     
     if (player.hand.length === 2) {
-      state = states.DEAL_DEALER
+      if (total(player.hand) === BLACKJACK) {
+        state = states.CALCUATE_WINNER
+      } else {
+        state = states.DEAL_DEALER
+      }
     }
   }
 
@@ -74,8 +78,10 @@ function Blackjack (dealerStandValue = 17, session = {}) {
       c.turn()
       player.hand.push(c)
       
-      if (total(player.hand) >= BLACKJACK) {
+      if (total(player.hand) === BLACKJACK) {
         state = states.DEALER_TURN
+      } else if (total(player.hand) > BLACKJACK) {
+        state = states.CALCULATE_WINNER
       }
     } else if (state === states.DEALER_TURN) {
       const c = deck.take()
@@ -92,7 +98,31 @@ function Blackjack (dealerStandValue = 17, session = {}) {
 
   }
 
-  const total = cards => cards.reduce((prev, curr) => prev + curr)
+  function total (cards) {
+    let nonAcesValue = cards.filter(card => card.value().rank !== 'A')
+                            .reduce((acc, card) => acc + cardValue(card), 0)
+
+    const aces = cards.filter(card => card.value().rank === 'A')
+
+    return aces.reduce((acc, ace, i, a) => {
+      const acesLeft = a.length - (i + 1)
+      if (acc + cardValue(ace) + acesLeft > 21) {
+        return acc + 1
+      } else {
+        return acc + cardValue(ace)
+      }
+    }, nonAcesValue)
+  }
+
+  function cardValue (card) {
+    if (Number(card.value().rank) <= 9) {
+      return Number(card.value().rank)
+    } else if (card.value().rank === 'A') {
+      return 11
+    } else {
+      return 10
+    }
+  }
 
   return {
     listActions,
