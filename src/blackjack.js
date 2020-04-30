@@ -135,13 +135,9 @@ function Blackjack (dealerStandValue = 17, session = {}) {
   function calculateWinner() {
     const pTotal = total(player.hand)
     const dTotal = total(dealerHand)
-    if (pTotal > dTotal) {
-      if (pTotal <= BLACKJACK) player.chips += (player.wagered * 2)
-    } else if (pTotal === dTotal) {
-      player.chips += player.wagered
-    } else {
-      if (dTotal > BLACKJACK) player.chips += (player.wagered * 2)
-    }
+    
+    if ((pTotal > dTotal && pTotal <= BLACKJACK) || dTotal > BLACKJACK) player.chips += (player.wagered * 2) // Player won
+    else if (pTotal === dTotal) player.chips += player.wagered // Player pushed (a draw)
 
     state = states.READY
   }
