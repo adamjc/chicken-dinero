@@ -53,49 +53,45 @@ function Blackjack (dealerStandValue = 17, session = {}) {
     }
   }
 
+  function dealCard(hand, faceUp = true) {
+    let c = deck.take()
+    if (faceUp) c.turn()
+    hand.push(c)
+  }
+
   function dealPlayer () {
     if (player.hand.length < 2) {
-      const c = deck.take()
-      c.turn()
-      player.hand.push(c)
+      dealCard(player.hand)
     }
-    
+
     if (player.hand.length === 2) {
-      if (total(player.hand) === BLACKJACK) {
-        state = STATES.CALCULATE_WINNER
-      } else {
-        state = STATES.DEAL_DEALER
-      }
+      state = total(player.hand) === BLACKJACK 
+        ? STATES.CALCULATE_WINNER
+        : STATES.DEAL_DEALER
     }
   }
 
   function dealDealer () {
     if (!dealerHand.length) {
-      const c = deck.take()
-      c.turn()
-      dealerHand.push(c)
+      dealCard(dealerHand)
     } else if (dealerHand.length === 1) {
-      const c = deck.take()
-      dealerHand.push(c)
+      dealCard(dealerHand, false)
       state = STATES.PLAYER_TURN
     }
   }
 
   function hit () {
     if (state === STATES.PLAYER_TURN) {
-      const c = deck.take()
-      c.turn()
-      player.hand.push(c)
-      
-      if (total(player.hand) === BLACKJACK) {
+      dealCard(player.hand)
+      const playerTotal = total(player.hand)
+
+      if (playerTotal === BLACKJACK) {
         state = STATES.DEALER_TURN
-      } else if (total(player.hand) > BLACKJACK) {
+      } else if (playerTotal > BLACKJACK) {
         state = STATES.CALCULATE_WINNER
       }
     } else if (state === STATES.DEALER_TURN) {
-      const c = deck.take()
-      c.turn()
-      dealerHand.push(c)
+      dealCard(dealerHand)
 
       if (total(dealerHand) >= DEALER_STAND_VALUE) {
         state = STATES.CALCULATE_WINNER
@@ -103,9 +99,7 @@ function Blackjack (dealerStandValue = 17, session = {}) {
     }
   }
 
-  function stand () {
-    state = STATES.DEALER_TURN
-  }
+  const stand = () => state = STATES.DEALER_TURN
 
   function total (cards) {
     let nonAcesValue = cards.filter(card => card.value().rank !== 'A')
@@ -134,11 +128,17 @@ function Blackjack (dealerStandValue = 17, session = {}) {
   }
 
   function calculateWinner() {
-    const pTotal = total(player.hand)
-    const dTotal = total(dealerHand)
+    const playerTotal = total(player.hand)
+    const dealerTotal = total(dealerHand)
     
-    if ((pTotal > dTotal && pTotal <= BLACKJACK) || dTotal > BLACKJACK) player.chips += (player.wagered * 2) // Player won
-    else if (pTotal === dTotal) player.chips += player.wagered // Player pushed (a draw)
+    const playerWin = (playerTotal > dealerTotal && playerTotal <= BLACKJACK) || dealerTotal > BLACKJACK
+    const playerDraw = playerTotal === dealerTotal
+    
+    if (playerWin) {
+      player.chips += (player.wagered * 2)
+    } else if (playerDraw) {
+      player.chips += player.wagered
+    }
 
     state = STATES.READY
   }
