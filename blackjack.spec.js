@@ -246,6 +246,39 @@ describe('Blackjack', () => {
   })
 
   describe('DEALER_TURN', () => {
+    describe('hitting and being below the dealer stand value', () => {
+      let game
+
+      beforeAll(() => {
+        Deck.mockImplementation(() => {
+          return {
+            take: () => new Card('A', 'S')
+          }
+        })
+      })
+
+      beforeEach(() => {
+        game = new Blackjack(17, {
+          state: 4,
+          player: { 
+            hand: [
+              new Card('A', 'S', true),
+              new Card('T', 'S', true),
+            ]
+          },
+          dealerHand: [
+            new Card('2', 'S', true),
+            new Card('3', 'S', true),
+          ]
+        })
+      })
+
+      it('should stay in DEALER_TURN', () => {
+        game.step()
+        expect(game.state()).toEqual(game.states.DEALER_TURN)
+      })
+    })
+
     describe('hitting the dealer stand value', () => {
       let game
 
@@ -276,6 +309,76 @@ describe('Blackjack', () => {
       it('should move to CALCULATE_WINNER', () => {
         game.step()
         expect(game.state()).toEqual(game.states.CALCULATE_WINNER)
+      })
+    })
+  })
+
+  describe('CALCULATE_WINNER', () => {
+    describe('player winning', () => {
+      let game
+      const initialChips = 90
+      const initialWager = 10
+      beforeEach(() => {
+        game = new Blackjack(17, {
+          state: 5,
+          player: {
+            hand: [
+              new Card('A', 'S', true),
+              new Card('T', 'S', true),
+            ],
+            chips: initialChips,
+            wagered: initialWager
+          },
+          dealerHand: [
+            new Card('J', 'S', true),
+            new Card('J', 'C', true),
+            new Card('5', 'H', true),
+          ]
+        })
+
+        game.step()
+      })
+
+      it(`should add twice the wagered chips to the player's chips`, () => {
+        expect(game.player().chips).toEqual(initialChips + (initialWager * 2))
+      })
+
+      it('should move to the READY state', () => {
+        expect(game.state()).toEqual(game.states.READY)
+      })
+    })
+
+    describe('player losing', () => {
+      let game
+      const initialChips = 90
+      const initialWager = 10
+      beforeEach(() => {
+        game = new Blackjack(17, {
+          state: 5,
+          player: {
+            hand: [
+              new Card('J', 'S', true),
+              new Card('J', 'C', true),
+              new Card('5', 'C', true),
+            ],
+            chips: initialChips,
+            wagered: initialWager
+          },
+          dealerHand: [
+            new Card('J', 'S', true),
+            new Card('7', 'C', true),
+          ]
+        })
+
+        game.step()
+      })
+
+      it(`should keep the player's chips as the initialChip value`, () => {
+        expect(game.player().chips).toEqual(initialChips)
+      })
+
+      it('should move to the READY state', () => {
+        expect(game.state()).toEqual(game.states.READY)
       })
     })
   })

@@ -15,12 +15,15 @@ function Blackjack (dealerStandValue = 17, session = {}) {
   let state = session.state || states.READY
   const deck = session.deck || new Deck()
   const dealerHand = session.dealerHand || []
-  const player = session.player || { hand: [] }
+  const player = session.player || { hand: [], chips: 100, wagered: 0 }
 
   // starts the game
   function wager (amount = 0) {
-    if (state !== states.READY) return
-    
+    if (amount > player.chips) return
+
+    player.wagered = amount
+    player.chips -= amount
+
     state = states.DEAL_PLAYER
   }
 
@@ -44,6 +47,8 @@ function Blackjack (dealerStandValue = 17, session = {}) {
       case states.DEALER_TURN:
         hit()
         return
+      case states.CALCULATE_WINNER:
+        calculateWinner()
     }
   }
 
@@ -125,6 +130,20 @@ function Blackjack (dealerStandValue = 17, session = {}) {
     } else {
       return 10
     }
+  }
+
+  function calculateWinner() {
+    const pTotal = total(player.hand)
+    const dTotal = total(dealerHand)
+    if (pTotal > dTotal) {
+      if (pTotal <= BLACKJACK) player.chips += (player.wagered * 2)
+    } else if (pTotal === dTotal) {
+      player.chips += player.wagered
+    } else {
+      if (dTotal > BLACKJACK) player.chips += (player.wagered * 2)
+    }
+
+    state = states.READY
   }
 
   return {
