@@ -54,9 +54,9 @@ function Blackjack (dealerStandValue = 17, session = {}) {
   }
 
   function dealCard(hand, faceUp = true) {
-    let c = deck.take()
-    if (faceUp) c.turn()
-    hand.push(c)
+    let card = deck.take()
+    if (faceUp) card.turn()
+    hand.push(card)
   }
 
   function dealPlayer () {
