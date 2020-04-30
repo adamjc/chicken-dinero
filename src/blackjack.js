@@ -131,12 +131,12 @@ function Blackjack (dealerStandValue = 17, session = {}) {
     const playerTotal = total(player.hand)
     const dealerTotal = total(dealerHand)
     
-    const playerWin = (playerTotal > dealerTotal && playerTotal <= BLACKJACK) || dealerTotal > BLACKJACK
-    const playerDraw = playerTotal === dealerTotal
+    const playerHasWon = (playerTotal > dealerTotal && playerTotal <= BLACKJACK) || dealerTotal > BLACKJACK
+    const playerHasDrawn = playerTotal === dealerTotal
     
-    if (playerWin) {
+    if (playerHasWon) {
       player.chips += (player.wagered * 2)
-    } else if (playerDraw) {
+    } else if (playerHasDrawn) {
       player.chips += player.wagered
     }
 
