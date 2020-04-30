@@ -1,18 +1,19 @@
 const { Deck } = require('./deck.js')
 
+const STATES = {
+  READY: 0,
+  DEAL_PLAYER: 1,
+  DEAL_DEALER: 2,
+  PLAYER_TURN: 3,
+  DEALER_TURN: 4,
+  CALCULATE_WINNER: 5
+}
+
 function Blackjack (dealerStandValue = 17, session = {}) {
   const BLACKJACK = 21
   const DEALER_STAND_VALUE = dealerStandValue
-  const states = {
-    READY: 0,
-    DEAL_PLAYER: 1,
-    DEAL_DEALER: 2,
-    PLAYER_TURN: 3,
-    DEALER_TURN: 4,
-    CALCULATE_WINNER: 5
-  }
 
-  let state = session.state || states.READY
+  let state = session.state || STATES.READY
   const deck = session.deck || new Deck()
   const dealerHand = session.dealerHand || []
   const player = session.player || { hand: [], chips: 100, wagered: 0 }
@@ -24,13 +25,13 @@ function Blackjack (dealerStandValue = 17, session = {}) {
     player.wagered = amount
     player.chips -= amount
 
-    state = states.DEAL_PLAYER
+    state = STATES.DEAL_PLAYER
   }
 
   function listActions () {
     switch (state) {
-      case states.READY: return [wager]
-      case states.PLAYER_TURN: return [hit, stand]
+      case STATES.READY: return [wager]
+      case STATES.PLAYER_TURN: return [hit, stand]
       default: return []
     }
   }
@@ -38,16 +39,16 @@ function Blackjack (dealerStandValue = 17, session = {}) {
   // do a step
   function step () {
     switch (state) {
-      case states.DEAL_PLAYER:
+      case STATES.DEAL_PLAYER:
         dealPlayer()
         return
-      case states.DEAL_DEALER:
+      case STATES.DEAL_DEALER:
         dealDealer()
         return
-      case states.DEALER_TURN:
+      case STATES.DEALER_TURN:
         hit()
         return
-      case states.CALCULATE_WINNER:
+      case STATES.CALCULATE_WINNER:
         calculateWinner()
     }
   }
@@ -61,9 +62,9 @@ function Blackjack (dealerStandValue = 17, session = {}) {
     
     if (player.hand.length === 2) {
       if (total(player.hand) === BLACKJACK) {
-        state = states.CALCULATE_WINNER
+        state = STATES.CALCULATE_WINNER
       } else {
-        state = states.DEAL_DEALER
+        state = STATES.DEAL_DEALER
       }
     }
   }
@@ -76,34 +77,34 @@ function Blackjack (dealerStandValue = 17, session = {}) {
     } else if (dealerHand.length === 1) {
       const c = deck.take()
       dealerHand.push(c)
-      state = states.PLAYER_TURN
+      state = STATES.PLAYER_TURN
     }
   }
 
   function hit () {
-    if (state === states.PLAYER_TURN) {
+    if (state === STATES.PLAYER_TURN) {
       const c = deck.take()
       c.turn()
       player.hand.push(c)
       
       if (total(player.hand) === BLACKJACK) {
-        state = states.DEALER_TURN
+        state = STATES.DEALER_TURN
       } else if (total(player.hand) > BLACKJACK) {
-        state = states.CALCULATE_WINNER
+        state = STATES.CALCULATE_WINNER
       }
-    } else if (state === states.DEALER_TURN) {
+    } else if (state === STATES.DEALER_TURN) {
       const c = deck.take()
       c.turn()
       dealerHand.push(c)
 
       if (total(dealerHand) >= DEALER_STAND_VALUE) {
-        state = states.CALCULATE_WINNER
+        state = STATES.CALCULATE_WINNER
       }
     }
   }
 
   function stand () {
-    state = states.DEALER_TURN
+    state = STATES.DEALER_TURN
   }
 
   function total (cards) {
@@ -139,7 +140,7 @@ function Blackjack (dealerStandValue = 17, session = {}) {
     if ((pTotal > dTotal && pTotal <= BLACKJACK) || dTotal > BLACKJACK) player.chips += (player.wagered * 2) // Player won
     else if (pTotal === dTotal) player.chips += player.wagered // Player pushed (a draw)
 
-    state = states.READY
+    state = STATES.READY
   }
 
   return {
@@ -147,9 +148,11 @@ function Blackjack (dealerStandValue = 17, session = {}) {
     step,
     dealerHand: () => dealerHand,
     state: () => state,
-    player: () => player,
-    states
+    player: () => player
   }
 }
 
-module.exports = Blackjack
+module.exports = {
+  Engine: Blackjack,
+  STATES
+}

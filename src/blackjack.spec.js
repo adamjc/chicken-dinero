@@ -1,23 +1,24 @@
-const Blackjack = require('./blackjack.js')
+const { Engine: Blackjack, STATES } = require('./blackjack.js')
 const { Deck } = require('./deck.js')
+const { Card } = jest.requireActual('./deck.js')
+
 jest.mock('./deck.js')
 Deck.mockImplementation(() => {
   return {
-    take: () => new Card('2', 'H')
+    take: () => new Card('2', 'S')
   }
 })
-const { Card } = jest.requireActual('./deck.js')
 
 describe('Blackjack', () => {
-  describe('READY', () => {
-    let game
+  let game
 
+  describe('READY', () => {
     beforeEach(() => {
       game = new Blackjack()
     })
 
     it('starts in the READY state', () => {
-      expect(game.state()).toEqual(game.states.READY)
+      expect(game.state()).toEqual(STATES.READY)
     })
   
     it(`only has 'wager' as an action`, () => {
@@ -29,15 +30,13 @@ describe('Blackjack', () => {
     it('moves to the DEAL_PLAYER state once a wager has been given', () => {
       const wager = game.listActions().filter(fn => fn.name === 'wager')[0] // eeeeeeeh
       wager() // eeeeeeEEEHHHH
-      expect(game.state()).toEqual(game.states.DEAL_PLAYER)
+      expect(game.state()).toEqual(STATES.DEAL_PLAYER)
     })
   })
 
   describe('DEAL_PLAYER', () => {
-    let game
-
     beforeEach(() => {
-      game = new Blackjack(17, { state: 1 })
+      game = new Blackjack(17, { state: STATES.DEAL_PLAYER })
     })
 
     it('deals the player two cards', () => {
@@ -52,21 +51,13 @@ describe('Blackjack', () => {
       game.step()
       game.step()
 
-      expect(game.state()).toEqual(game.states.DEAL_DEALER)
+      expect(game.state()).toEqual(STATES.DEAL_DEALER)
     })
   })
   
   describe('DEAL_DEALER', () => {
-    let game
-
     beforeEach(() => {
-      const deck = new Deck()
-      cards = new Array(2).fill(deck.take())
-
-      game = new Blackjack(17, {
-        state: 2,
-        player: { hand: cards }
-      })
+      game = new Blackjack(17, { state: STATES.DEAL_DEALER })
     })
 
     it('deals the dealer two cards', () => {
@@ -81,7 +72,7 @@ describe('Blackjack', () => {
       game.step()
       game.step()
 
-      expect(game.state()).toEqual(game.states.PLAYER_TURN)
+      expect(game.state()).toEqual(STATES.PLAYER_TURN)
     })
   })
 
@@ -89,14 +80,7 @@ describe('Blackjack', () => {
     let game
 
     beforeEach(() => {
-      const deck = new Deck()
-      cards = new Array(2).fill(deck.take())
-
-      game = new Blackjack(17, {
-        state: 3,
-        player: { hand: cards },
-        dealerHand: cards
-      })
+      game = new Blackjack(17, { state: STATES.PLAYER_TURN })
     })
 
     it(`should let the player 'hit' or 'stand'`, () => {
@@ -112,26 +96,15 @@ describe('Blackjack', () => {
 
     describe('hit', () => {
       describe('below 21', () => {
-        Deck.mockImplementation(() => {
-          return {
-            take: () => new Card('A', 'S')
-          }
-        })
-
-        let game
-
         beforeEach(() => {
-          cards = [
-            new Card('6', 'S', true),
-            new Card('A', 'H', true),
-          ]
-    
           game = new Blackjack(17, {
-            state: 3,
+            state: STATES.PLAYER_TURN,
             player: { 
-              hand: cards
-            },
-            dealerHand: cards
+              hand: [
+                new Card('6', 'S', true),
+                new Card('A', 'H', true)
+              ] 
+            }
           })
 
           const hit = game.listActions().filter(fn => fn.name === 'hit')[0] // eeeeeeeh
@@ -143,29 +116,20 @@ describe('Blackjack', () => {
         })
 
         it('should still be in the PLAYER_TURN state', () => {
-          expect(game.state()).toEqual(game.states.PLAYER_TURN)
+          expect(game.state()).toEqual(STATES.PLAYER_TURN)
         })
       })
 
       describe('exactly 21', () => {
-        Deck.mockImplementation(() => {
-          return {
-            take: () => new Card('A', 'S')
-          }
-        })
-  
-        let game
-  
         beforeEach(() => {
           game = new Blackjack(17, {
-            state: 3,
+            state: STATES.PLAYER_TURN,
             player: { 
               hand: [
-                new Card('5', 'D', true),
-                new Card('5', 'S', true),
+                new Card('T', 'D', true),
+                new Card('9', 'S', true)
               ]
-            },
-            dealerHand: cards
+            }
           })
   
           const hit = game.listActions().filter(fn => fn.name === 'hit')[0] // eeeeeeeh
@@ -177,31 +141,20 @@ describe('Blackjack', () => {
         })
   
         it('should move to the DEALER_TURN state', () => {
-          expect(game.state()).toEqual(game.states.DEALER_TURN)
+          expect(game.state()).toEqual(STATES.DEALER_TURN)
         })
       })
 
       describe('over 21', () => {
-        let game
-
-        beforeAll(() => {
-          Deck.mockImplementation(() => {
-            return {
-              take: () => new Card('2', 'S')
-            }
-          })
-        })
-  
         beforeEach(() => {
           game = new Blackjack(17, {
-            state: 3,
+            state: STATES.PLAYER_TURN,
             player: { 
               hand: [
                 new Card('J', 'D', true),
                 new Card('T', 'S', true),
               ]
-            },
-            dealerHand: cards
+            }
           })
   
           const hit = game.listActions().filter(fn => fn.name === 'hit')[0] // eeeeeeeh
@@ -213,26 +166,21 @@ describe('Blackjack', () => {
         })
   
         it('should move to the CALCULATE_WINNER state', () => {
-          expect(game.state()).toEqual(game.states.CALCULATE_WINNER)
+          expect(game.state()).toEqual(STATES.CALCULATE_WINNER)
         })
       })
     })
 
     describe('stand', () => {
-      let game
-
       beforeEach(() => {
-        cards = [
-          new Card('6', 'S', true),
-          new Card('A', 'H', true),
-        ]
-
         game = new Blackjack(17, {
-          state: 3,
+          state: STATES.PLAYER_TURN,
           player: { 
-            hand: cards
-          },
-          dealerHand: cards
+            hand: [
+              new Card('6', 'S', true),
+              new Card('A', 'H', true)
+            ]
+          }
         })
 
         const stand = game.listActions().filter(fn => fn.name === 'stand')[0] // eeeeeeeh
@@ -240,32 +188,16 @@ describe('Blackjack', () => {
       })
 
       it('should be move to the DEALER_TURN state', () => {
-        expect(game.state()).toEqual(game.states.DEALER_TURN)
+        expect(game.state()).toEqual(STATES.DEALER_TURN)
       })
     })
   })
 
   describe('DEALER_TURN', () => {
     describe('hitting and being below the dealer stand value', () => {
-      let game
-
-      beforeAll(() => {
-        Deck.mockImplementation(() => {
-          return {
-            take: () => new Card('A', 'S')
-          }
-        })
-      })
-
       beforeEach(() => {
         game = new Blackjack(17, {
-          state: 4,
-          player: { 
-            hand: [
-              new Card('A', 'S', true),
-              new Card('T', 'S', true),
-            ]
-          },
+          state: STATES.DEALER_TURN,
           dealerHand: [
             new Card('2', 'S', true),
             new Card('3', 'S', true),
@@ -275,52 +207,36 @@ describe('Blackjack', () => {
 
       it('should stay in DEALER_TURN', () => {
         game.step()
-        expect(game.state()).toEqual(game.states.DEALER_TURN)
+        expect(game.state()).toEqual(STATES.DEALER_TURN)
       })
     })
 
     describe('hitting the dealer stand value', () => {
-      let game
-
-      beforeAll(() => {
-        Deck.mockImplementation(() => {
-          return {
-            take: () => new Card('A', 'S')
-          }
-        })
-      })
-
       beforeEach(() => {
         game = new Blackjack(17, {
-          state: 4,
-          player: { 
-            hand: [
-              new Card('A', 'S', true),
-              new Card('T', 'S', true),
-            ]
-          },
+          state: STATES.DEALER_TURN,
           dealerHand: [
             new Card('A', 'S', true),
-            new Card('9', 'S', true),
+            new Card('8', 'S', true),
           ]
         })
       })
 
       it('should move to CALCULATE_WINNER', () => {
         game.step()
-        expect(game.state()).toEqual(game.states.CALCULATE_WINNER)
+        expect(game.state()).toEqual(STATES.CALCULATE_WINNER)
       })
     })
   })
 
   describe('CALCULATE_WINNER', () => {
+    const initialChips = 90
+    const initialWager = 10
+
     describe('player winning', () => {
-      let game
-      const initialChips = 90
-      const initialWager = 10
       beforeEach(() => {
         game = new Blackjack(17, {
-          state: 5,
+          state: STATES.CALCULATE_WINNER,
           player: {
             hand: [
               new Card('A', 'S', true),
@@ -344,17 +260,14 @@ describe('Blackjack', () => {
       })
 
       it('should move to the READY state', () => {
-        expect(game.state()).toEqual(game.states.READY)
+        expect(game.state()).toEqual(STATES.READY)
       })
     })
 
     describe('player losing', () => {
-      let game
-      const initialChips = 90
-      const initialWager = 10
       beforeEach(() => {
         game = new Blackjack(17, {
-          state: 5,
+          state: STATES.CALCULATE_WINNER,
           player: {
             hand: [
               new Card('J', 'S', true),
@@ -378,7 +291,7 @@ describe('Blackjack', () => {
       })
 
       it('should move to the READY state', () => {
-        expect(game.state()).toEqual(game.states.READY)
+        expect(game.state()).toEqual(STATES.READY)
       })
     })
   })
