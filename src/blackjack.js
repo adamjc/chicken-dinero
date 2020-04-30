@@ -1,12 +1,12 @@
 const { Deck } = require('./deck.js')
 
 const STATES = {
-  READY: 0,
-  DEAL_PLAYER: 1,
-  DEAL_DEALER: 2,
-  PLAYER_TURN: 3,
-  DEALER_TURN: 4,
-  CALCULATE_WINNER: 5
+  READY: 1,
+  DEAL_PLAYER: 2,
+  DEAL_DEALER: 3,
+  PLAYER_TURN: 4,
+  DEALER_TURN: 5,
+  CALCULATE_WINNER: 6
 }
 
 function Blackjack (dealerStandValue = 17, session = {}) {
