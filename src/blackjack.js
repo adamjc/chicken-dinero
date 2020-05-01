@@ -65,7 +65,7 @@ function Blackjack (dealerStandValue = 17, session = {}) {
     }
 
     if (player.hand.length === 2) {
-      state = total(player.hand) === BLACKJACK 
+      state = total(player.hand) === BLACKJACK
         ? STATES.CALCULATE_WINNER
         : STATES.DEAL_DEALER
     }
@@ -102,25 +102,27 @@ function Blackjack (dealerStandValue = 17, session = {}) {
   const stand = () => state = STATES.DEALER_TURN
 
   function total (cards) {
-    let nonAcesValue = cards.filter(card => card.value().rank !== 'A')
+    let nonAceValues = cards.filter(card => card.getDetails().rank !== 'A')
                             .reduce((acc, card) => acc + cardValue(card), 0)
 
-    const aces = cards.filter(card => card.value().rank === 'A')
+    const aces = cards.filter(card => card.getDetails().rank === 'A')
 
-    return aces.reduce((acc, ace, i, a) => {
+    return aces.reduce((runningTotal, ace, i, a) => {
       const acesLeft = a.length - (i + 1)
-      if (acc + cardValue(ace) + acesLeft > 21) {
-        return acc + 1
+
+      if (runningTotal + cardValue(ace) + acesLeft > 21) {
+        return runningTotal + 1
       } else {
-        return acc + cardValue(ace)
+        return runningTotal + cardValue(ace)
       }
-    }, nonAcesValue)
+    }, nonAceValues)
   }
 
   function cardValue (card) {
-    if (Number(card.value().rank) <= 9) {
-      return Number(card.value().rank)
-    } else if (card.value().rank === 'A') {
+    const cardRank = card.getDetails().rank
+    if (Number(cardRank) <= 9) {
+      return Number(cardRank)
+    } else if (cardRank === 'A') {
       return 11
     } else {
       return 10

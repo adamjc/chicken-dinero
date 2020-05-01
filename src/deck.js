@@ -6,12 +6,13 @@ function Card (rank, suit, faceUp = false) {
   const FACE_UP = {
     rank,
     suit,
-    faceValue: `${rank}${suit}`
+    toString: () => `${rank}${suit}`
   }
+
   let turned = faceUp
 
   return {
-    value: () => turned ? FACE_UP : FACE_DOWN,
+    getDetails: () => turned ? FACE_UP : FACE_DOWN,
     turn: () => turned = !turned
   }
 }
@@ -23,7 +24,7 @@ function Deck () {
     ranks.forEach(rank => {
       cards.push(new Card(rank, suit))
     })
-  }) 
+  })
 
   function take () {
     const i = Math.random() * cards.length
