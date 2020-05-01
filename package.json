@@ -1,8 +1,8 @@
 {
-  "name": "blackjack",
+  "name": "chicken-dinero",
   "version": "1.0.0",
-  "description": "Blackjack.",
-  "main": "index.js",
+  "description": "It's Blackjack.",
+  "main": "src/blackjack.js",
   "scripts": {
     "test": "jest"
   },
