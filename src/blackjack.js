@@ -28,10 +28,10 @@ function Blackjack (dealerStandValue = 17, session = {}) {
     state = STATES.DEAL_PLAYER
   }
 
-  function listActions () {
+  function getActions () {
     switch (state) {
-      case STATES.READY: return [wager]
-      case STATES.PLAYER_TURN: return [hit, stand]
+      case STATES.READY: return { wager }
+      case STATES.PLAYER_TURN: return { hit, stand }
       default: return []
     }
   }
@@ -50,6 +50,19 @@ function Blackjack (dealerStandValue = 17, session = {}) {
         return
       case STATES.CALCULATE_WINNER:
         calculateWinner()
+    }
+  }
+
+  function stepUntilChange () {
+    const statesWithMultipleSteps = [STATES.DEAL_PLAYER, STATES.DEAL_DEALER, STATES.DEALER_TURN, STATES.CALCULATE_WINNER]
+    if (statesWithMultipleSteps.includes(state)) {
+      const initialState = state
+
+      while (initialState === state) {
+        step()
+      }
+    } else {
+      step()
     }
   }
 
@@ -146,11 +159,12 @@ function Blackjack (dealerStandValue = 17, session = {}) {
   }
 
   return {
-    listActions,
+    getActions,
     step,
-    dealerHand: () => dealerHand,
-    state: () => state,
-    player: () => player
+    stepUntilChange,
+    getDealerHand: () => dealerHand,
+    getState: () => state,
+    getPlayer: () => player
   }
 }
 

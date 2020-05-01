@@ -5,14 +5,14 @@ function Card (rank, suit, faceUp = false) {
   const FACE_DOWN = null
   const FACE_UP = {
     rank,
-    suit,
-    toString: () => `${rank}${suit}`
+    suit
   }
 
   let turned = faceUp
 
   return {
     getDetails: () => turned ? FACE_UP : FACE_DOWN,
+    toString: () => turned ? `${rank}${suit}` : '',
     turn: () => turned = !turned
   }
 }
