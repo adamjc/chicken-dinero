@@ -254,8 +254,8 @@ describe('Blackjack', () => {
         expect(game.getPlayer().chips).toEqual(initialChips + (initialWager * 2))
       })
 
-      it('should move to the READY state', () => {
-        expect(game.getState()).toEqual(STATES.READY)
+      it('should move to the DONE state', () => {
+        expect(game.getState()).toEqual(STATES.DONE)
       })
     })
 
@@ -285,8 +285,8 @@ describe('Blackjack', () => {
         expect(game.getPlayer().chips).toEqual(initialChips)
       })
 
-      it('should move to the READY state', () => {
-        expect(game.getState()).toEqual(STATES.READY)
+      it('should move to the DONE state', () => {
+        expect(game.getState()).toEqual(STATES.DONE)
       })
     })
   })

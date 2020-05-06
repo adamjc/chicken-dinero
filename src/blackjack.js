@@ -163,7 +163,7 @@ function Blackjack (dealerStandValue = 17, session = {}) {
       player.chips += player.wagered
     }
 
-    state = STATES.READY
+    state = STATES.DONE
   }
 
   return {
