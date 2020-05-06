@@ -46,6 +46,9 @@ function Blackjack (dealerStandValue = 17, session = {}) {
         dealDealer()
         return
       case STATES.DEALER_TURN:
+        let faceDownCards = dealerHand.filter(card => card.getDetails() === null)
+        faceDownCards.forEach(card => card.turn())
+
         hit()
         return
       case STATES.CALCULATE_WINNER:
