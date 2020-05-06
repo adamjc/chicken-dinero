@@ -115,10 +115,15 @@ function Blackjack (dealerStandValue = 17, session = {}) {
   const stand = () => state = STATES.DEALER_TURN
 
   function total (cards) {
+    let faceDownCards = cards.filter(card => card.getDetails() === null)
+    faceDownCards.forEach(card => card.turn())
+
     let nonAceValues = cards.filter(card => card.getDetails().rank !== 'A')
                             .reduce((acc, card) => acc + cardValue(card), 0)
 
     const aces = cards.filter(card => card.getDetails().rank === 'A')
+
+    faceDownCards.forEach(card => card.turn())
 
     return aces.reduce((runningTotal, ace, i, a) => {
       const acesLeft = a.length - (i + 1)

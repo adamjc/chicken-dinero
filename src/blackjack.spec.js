@@ -195,7 +195,7 @@ describe('Blackjack', () => {
           state: STATES.DEALER_TURN,
           dealerHand: [
             new Card('2', 'S', true),
-            new Card('3', 'S', true),
+            new Card('3', 'S', false),
           ]
         })
       })
@@ -212,7 +212,7 @@ describe('Blackjack', () => {
           state: STATES.DEALER_TURN,
           dealerHand: [
             new Card('A', 'S', true),
-            new Card('8', 'S', true),
+            new Card('8', 'S', false),
           ]
         })
       })
@@ -235,7 +235,7 @@ describe('Blackjack', () => {
           player: {
             hand: [
               new Card('A', 'S', true),
-              new Card('T', 'S', true),
+              new Card('T', 'S', false),
             ],
             chips: initialChips,
             wagered: initialWager
