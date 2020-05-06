@@ -6,7 +6,8 @@ const STATES = {
   DEAL_DEALER: 3,
   PLAYER_TURN: 4,
   DEALER_TURN: 5,
-  CALCULATE_WINNER: 6
+  CALCULATE_WINNER: 6,
+  DONE: 7
 }
 
 function Blackjack (dealerStandValue = 17, session = {}) {
