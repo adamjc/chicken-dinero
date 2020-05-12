@@ -127,6 +127,8 @@ function Blackjack (dealerStandValue = 17, session = {}) {
     let faceDownCards = []
     if (calculateFaceDown) {
       faceDownCards = cards.filter(card => card.getDetails() === null)
+    } else {
+      cards = cards.filter(card => card.getDetails() !== null)
     }
     faceDownCards.forEach(card => card.turn())
 
