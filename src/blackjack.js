@@ -20,7 +20,7 @@ function Blackjack (dealerStandValue = 17, session = {}) {
   let player = session.player || { hand: [], chips: 100, wagered: 0 }
 
   const stand = () => state = STATES.DEALER_TURN
-  const dealCard = (faceUp = false) => deck.take(faceUp)
+  const dealCard = (faceUp = true) => deck.take(faceUp)
 
   // starts the game
   function wager (amount = 0) {
@@ -200,4 +200,4 @@ function Blackjack (dealerStandValue = 17, session = {}) {
 module.exports = {
   Engine: Blackjack,
   STATES
-}
+} 
