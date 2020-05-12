@@ -26,9 +26,10 @@ function Deck () {
     })
   })
 
-  function take () {
+  function take (faceUp = false) {
     const i = Math.random() * cards.length
     const card = cards.splice(i, 1)[0]
+    if (faceUp) card.turn()
     return card
   }
 

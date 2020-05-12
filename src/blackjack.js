@@ -19,6 +19,9 @@ function Blackjack (dealerStandValue = 17, session = {}) {
   let dealerHand = session.dealerHand || []
   let player = session.player || { hand: [], chips: 100, wagered: 0 }
 
+  const stand = () => state = STATES.DEALER_TURN
+  const dealCard = (faceUp = false) => deck.take(faceUp)
+
   // starts the game
   function wager (amount = 0) {
     if (amount > player.chips) return
@@ -55,6 +58,9 @@ function Blackjack (dealerStandValue = 17, session = {}) {
   }
 
   function dealerTurn () {
+    const faceDownCards = dealerHand.filter(card => ! card.getDetails())
+    faceDownCards.forEach(card => card.turn())
+
     if (total(dealerHand, true) >= DEALER_STAND_VALUE) {
       state = STATES.CALCULATE_WINNER
     } else {
@@ -75,15 +81,9 @@ function Blackjack (dealerStandValue = 17, session = {}) {
     }
   }
 
-  function dealCard(hand, faceUp = true) {
-    let card = deck.take()
-    if (faceUp) card.turn()
-    hand.push(card)
-  }
-
   function dealPlayer () {
     if (player.hand.length < 2) {
-      dealCard(player.hand)
+      player.hand.push(dealCard())
     }
 
     if (player.hand.length === 2) {
@@ -95,16 +95,16 @@ function Blackjack (dealerStandValue = 17, session = {}) {
 
   function dealDealer () {
     if (!dealerHand.length) {
-      dealCard(dealerHand)
+      dealerHand.push(dealCard())
     } else if (dealerHand.length === 1) {
-      dealCard(dealerHand, false)
+      dealerHand.push(dealCard(false))
       state = STATES.PLAYER_TURN
     }
   }
 
   function hit () {
     if (state === STATES.PLAYER_TURN) {
-      dealCard(player.hand)
+      player.hand.push(dealCard())
       const playerTotal = total(player.hand)
 
       if (playerTotal === BLACKJACK) {
@@ -113,7 +113,7 @@ function Blackjack (dealerStandValue = 17, session = {}) {
         state = STATES.CALCULATE_WINNER
       }
     } else if (state === STATES.DEALER_TURN) {
-      dealCard(dealerHand)
+      dealerHand.push(dealCard())
 
       if (total(dealerHand) >= DEALER_STAND_VALUE) {
         state = STATES.CALCULATE_WINNER
@@ -121,14 +121,12 @@ function Blackjack (dealerStandValue = 17, session = {}) {
     }
   }
 
-  const stand = () => state = STATES.DEALER_TURN
-
   function total (cards, calculateFaceDown = true) {
     let faceDownCards = []
     if (calculateFaceDown) {
-      faceDownCards = cards.filter(card => card.getDetails() === null)
+      faceDownCards = cards.filter(card => !card.getDetails())
     } else {
-      cards = cards.filter(card => card.getDetails() !== null)
+      cards = cards.filter(card => card.getDetails())
     }
     faceDownCards.forEach(card => card.turn())
 
@@ -137,9 +135,7 @@ function Blackjack (dealerStandValue = 17, session = {}) {
 
     const aces = cards.filter(card => card.getDetails().rank === 'A')
 
-    faceDownCards.forEach(card => card.turn())
-
-    return aces.reduce((runningTotal, ace, i, a) => {
+    const total = aces.reduce((runningTotal, ace, i, a) => {
       const acesLeft = a.length - (i + 1)
 
       if (runningTotal + cardValue(ace) + acesLeft > 21) {
@@ -148,6 +144,10 @@ function Blackjack (dealerStandValue = 17, session = {}) {
         return runningTotal + cardValue(ace)
       }
     }, nonAceValues)
+
+    faceDownCards.forEach(card => card.turn())
+
+    return total
   }
 
   function cardValue (card) {
