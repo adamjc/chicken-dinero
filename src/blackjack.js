@@ -179,6 +179,7 @@ function Blackjack (dealerStandValue = 17, session = {}) {
     clearBoard,
     getActions,
     step,
+    total,
     stepUntilChange,
     getDealerHand: () => dealerHand,
     getState: () => state,
