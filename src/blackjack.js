@@ -167,7 +167,16 @@ function Blackjack (dealerStandValue = 17, session = {}) {
     state = STATES.DONE
   }
 
+  // Resets player's hand, dealer's hand, gives a new deck (no card counting here!)
+  function clearBoard () {
+    player.hand = []
+    dealerHand = []
+    deck = new Deck()
+    state = STATES.READY
+  }
+
   return {
+    clearBoard,
     getActions,
     step,
     stepUntilChange,
