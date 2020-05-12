@@ -15,9 +15,9 @@ function Blackjack (dealerStandValue = 17, session = {}) {
   const DEALER_STAND_VALUE = dealerStandValue
 
   let state = session.state || STATES.READY
-  const deck = session.deck || new Deck()
-  const dealerHand = session.dealerHand || []
-  const player = session.player || { hand: [], chips: 100, wagered: 0 }
+  let deck = session.deck || new Deck()
+  let dealerHand = session.dealerHand || []
+  let player = session.player || { hand: [], chips: 100, wagered: 0 }
 
   // starts the game
   function wager (amount = 0) {
