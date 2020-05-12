@@ -47,13 +47,18 @@ function Blackjack (dealerStandValue = 17, session = {}) {
         dealDealer()
         return
       case STATES.DEALER_TURN:
-        let faceDownCards = dealerHand.filter(card => card.getDetails() === null)
-        faceDownCards.forEach(card => card.turn())
-
-        hit()
+        dealerTurn()
         return
       case STATES.CALCULATE_WINNER:
         calculateWinner()
+    }
+  }
+
+  function dealerTurn () {
+    if (total(dealerHand, true) >= DEALER_STAND_VALUE) {
+      state = STATES.CALCULATE_WINNER
+    } else {
+      hit()
     }
   }
 
@@ -118,8 +123,11 @@ function Blackjack (dealerStandValue = 17, session = {}) {
 
   const stand = () => state = STATES.DEALER_TURN
 
-  function total (cards) {
-    let faceDownCards = cards.filter(card => card.getDetails() === null)
+  function total (cards, calculateFaceDown = true) {
+    let faceDownCards = []
+    if (calculateFaceDown) {
+      faceDownCards = cards.filter(card => card.getDetails() === null)
+    }
     faceDownCards.forEach(card => card.turn())
 
     let nonAceValues = cards.filter(card => card.getDetails().rank !== 'A')

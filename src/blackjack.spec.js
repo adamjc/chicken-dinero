@@ -217,6 +217,11 @@ describe('Blackjack', () => {
         })
       })
 
+      it('should not add a card to the dealers hand', () => {
+        game.step()
+        expect(game.getDealerHand().length).toEqual(2)
+      })
+
       it('should move to CALCULATE_WINNER', () => {
         game.step()
         expect(game.getState()).toEqual(STATES.CALCULATE_WINNER)
